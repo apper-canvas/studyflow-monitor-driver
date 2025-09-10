@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import Header from "@/components/organisms/Header";
-import Card from "@/components/atoms/Card";
-import Badge from "@/components/atoms/Badge";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
+import React, { useEffect, useState } from "react";
 import { assignmentService } from "@/services/api/assignmentService";
 import { courseService } from "@/services/api/courseService";
+import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import Badge from "@/components/atoms/Badge";
+import Card from "@/components/atoms/Card";
+import Header from "@/components/organisms/Header";
 
 const Grades = ({ onMenuClick }) => {
   const [assignments, setAssignments] = useState([]);
@@ -37,33 +37,38 @@ const Grades = ({ onMenuClick }) => {
     }
   };
 
-  const getCourseById = (courseId) => {
+const getCourseById = (courseId) => {
     return courses.find(c => c.Id === courseId);
   };
 
-  const calculateCourseGrade = (courseId) => {
+const calculateCourseGrade = (courseId) => {
     const courseAssignments = assignments.filter(a => 
-      a.courseId === courseId && a.grade !== null && a.grade !== undefined
+      (a.course_id_c?.Id === courseId || a.course_id_c === courseId) && 
+      a.grade_c !== null && a.grade_c !== undefined
     );
     
     if (courseAssignments.length === 0) return null;
     
-    const totalPoints = courseAssignments.reduce((sum, a) => sum + a.grade, 0);
-    const totalMaxPoints = courseAssignments.reduce((sum, a) => sum + a.maxPoints, 0);
+    const totalPoints = courseAssignments.reduce((sum, a) => sum + (a.grade_c || 0), 0);
+    const totalMaxPoints = courseAssignments.reduce((sum, a) => sum + (a.max_points_c || 0), 0);
+    
+    if (totalMaxPoints === 0) return null;
     
     return (totalPoints / totalMaxPoints) * 100;
   };
 
-  const calculateOverallGPA = () => {
+const calculateOverallGPA = () => {
     const courseGrades = courses.map(course => ({
       grade: calculateCourseGrade(course.Id),
-      credits: course.credits
+      credits: course.credits_c || 3
     })).filter(c => c.grade !== null);
     
     if (courseGrades.length === 0) return null;
     
     const totalGradePoints = courseGrades.reduce((sum, c) => sum + (convertToGPA(c.grade) * c.credits), 0);
     const totalCredits = courseGrades.reduce((sum, c) => sum + c.credits, 0);
+    
+    if (totalCredits === 0) return null;
     
     return totalGradePoints / totalCredits;
   };
@@ -103,9 +108,9 @@ const Grades = ({ onMenuClick }) => {
     if (percentage >= 67) return "D+";
     if (percentage >= 65) return "D";
     return "F";
-  };
+};
 
-  const gradedAssignments = assignments.filter(a => a.grade !== null && a.grade !== undefined);
+  const gradedAssignments = assignments.filter(a => a.grade_c !== null && a.grade_c !== undefined);
   const overallGPA = calculateOverallGPA();
 
   if (loading) return <Loading />;
@@ -155,21 +160,23 @@ const Grades = ({ onMenuClick }) => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Grades</h3>
               
               <div className="space-y-4">
-                {courses.map(course => {
+{courses.map(course => {
                   const courseGrade = calculateCourseGrade(course.Id);
-                  const courseAssignments = assignments.filter(a => a.courseId === course.Id);
-                  const gradedCount = courseAssignments.filter(a => a.grade !== null && a.grade !== undefined).length;
+                  const courseAssignments = assignments.filter(a => 
+                    a.course_id_c?.Id === course.Id || a.course_id_c === course.Id
+                  );
+                  const gradedCount = courseAssignments.filter(a => a.grade_c !== null && a.grade_c !== undefined).length;
                   
                   return (
                     <div key={course.Id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center">
                         <div 
                           className="w-4 h-4 rounded-full mr-3"
-                          style={{ backgroundColor: course.color }}
+                          style={{ backgroundColor: course.color_c || '#6366F1' }}
                         />
                         <div>
-                          <h4 className="font-medium text-gray-900">{course.code}</h4>
-                          <p className="text-sm text-gray-600">{course.name}</p>
+                          <h4 className="font-medium text-gray-900">{course.code_c || 'N/A'}</h4>
+                          <p className="text-sm text-gray-600">{course.name_c || 'Unknown Course'}</p>
                           <p className="text-xs text-gray-500">{gradedCount} of {courseAssignments.length} graded</p>
                         </div>
                       </div>
@@ -198,24 +205,24 @@ const Grades = ({ onMenuClick }) => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Grades</h3>
               
               <div className="space-y-4">
-                {gradedAssignments
+{gradedAssignments
                   .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                   .slice(0, 8)
                   .map(assignment => {
-                    const course = getCourseById(assignment.courseId);
-                    const percentage = (assignment.grade / assignment.maxPoints) * 100;
+                    const course = getCourseById(assignment.course_id_c?.Id || assignment.course_id_c);
+                    const percentage = (assignment.grade_c / assignment.max_points_c) * 100;
                     
                     return (
                       <div key={assignment.Id} className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">{assignment.title}</h4>
-                          <p className="text-sm text-gray-600">{course?.code}</p>
+                          <h4 className="font-medium text-gray-900 truncate">{assignment.title_c}</h4>
+                          <p className="text-sm text-gray-600">{course?.code_c}</p>
                         </div>
                         
-                        <div className="flex items-center space-x-3">
+<div className="flex items-center space-x-3">
                           <div className="text-right">
                             <p className="font-medium text-gray-900">
-                              {assignment.grade}/{assignment.maxPoints}
+                              {assignment.grade_c}/{assignment.max_points_c}
                             </p>
                             <Badge variant={getGradeColor(percentage)} className="text-xs">
                               {percentage.toFixed(0)}%
@@ -235,9 +242,9 @@ const Grades = ({ onMenuClick }) => {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {["A", "B", "C", "D/F"].map((grade, index) => {
-                let count = 0;
+let count = 0;
                 gradedAssignments.forEach(assignment => {
-                  const percentage = (assignment.grade / assignment.maxPoints) * 100;
+                  const percentage = (assignment.grade_c / assignment.max_points_c) * 100;
                   const letterGrade = getLetterGrade(percentage);
                   
                   if (grade === "A" && letterGrade.startsWith("A")) count++;

@@ -91,8 +91,9 @@ const Courses = ({ onMenuClick }) => {
   };
 
   const getCourseStats = (courseId) => {
-    const courseAssignments = assignments.filter(a => a.courseId === courseId);
-    const gradedAssignments = courseAssignments.filter(a => a.grade !== null && a.grade !== undefined);
+const courseAssignments = assignments.filter(a => 
+      a.course_id_c?.Id === courseId || a.course_id_c === courseId);
+const gradedAssignments = courseAssignments.filter(a => a.grade_c !== null && a.grade_c !== undefined);
     
     const assignmentCount = courseAssignments.length;
     const averageGrade = gradedAssignments.length > 0 
@@ -106,9 +107,9 @@ const Courses = ({ onMenuClick }) => {
     if (!searchTerm) return courses;
     
     return courses.filter(course =>
-      course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.instructor.toLowerCase().includes(searchTerm.toLowerCase())
+course.name_c.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.code_c.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.instructor_c.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 

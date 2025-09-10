@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useSelector } from 'react-redux';
 import ApperIcon from "@/components/ApperIcon";
 import { cn } from "@/utils/cn";
+import { AuthContext } from "../../App";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
+  const { logout } = useContext(AuthContext);
+  const { user } = useSelector((state) => state.user);
   
   const navigation = [
     { name: "Dashboard", href: "/", icon: "Home" },
@@ -12,6 +16,11 @@ const Sidebar = ({ isOpen, onClose }) => {
     { name: "Courses", href: "/courses", icon: "BookOpen" },
     { name: "Grades", href: "/grades", icon: "TrendingUp" }
   ];
+
+  const handleLogout = async () => {
+    await logout();
+    onClose();
+  };
 
   const NavItem = ({ item }) => {
     const isActive = location.pathname === item.href;
@@ -53,8 +62,25 @@ const Sidebar = ({ isOpen, onClose }) => {
             ))}
           </nav>
           
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center text-sm text-gray-500">
+<div className="p-4 border-t border-gray-200">
+            {user && (
+              <div className="mb-4">
+                <div className="text-sm font-medium text-gray-900">
+                  {user.firstName} {user.lastName}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {user.emailAddress}
+                </div>
+              </div>
+            )}
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+            >
+              <ApperIcon name="LogOut" size={16} className="mr-2" />
+              Logout
+            </button>
+            <div className="flex items-center text-sm text-gray-500 mt-3">
               <ApperIcon name="Calendar" size={16} className="mr-2" />
               {new Date().toLocaleDateString("en-US", { 
                 weekday: "long", 
@@ -90,11 +116,31 @@ const Sidebar = ({ isOpen, onClose }) => {
               </button>
             </div>
             
-            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+<nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
               {navigation.map((item) => (
                 <NavItem key={item.name} item={item} />
               ))}
             </nav>
+            
+            <div className="p-4 border-t border-gray-200">
+              {user && (
+                <div className="mb-4">
+                  <div className="text-sm font-medium text-gray-900">
+                    {user.firstName} {user.lastName}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {user.emailAddress}
+                  </div>
+                </div>
+              )}
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+              >
+                <ApperIcon name="LogOut" size={16} className="mr-2" />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       )}

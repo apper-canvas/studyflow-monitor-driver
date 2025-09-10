@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from "react";
-import Header from "@/components/organisms/Header";
+import React, { useEffect, useState } from "react";
+import { assignmentService } from "@/services/api/assignmentService";
+import { courseService } from "@/services/api/courseService";
+import { isPast, isThisWeek, isToday, isTomorrow } from "date-fns";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
 import StatCard from "@/components/molecules/StatCard";
 import AssignmentCard from "@/components/molecules/AssignmentCard";
 import Card from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
+import Header from "@/components/organisms/Header";
 import AssignmentModal from "@/components/organisms/AssignmentModal";
-import { assignmentService } from "@/services/api/assignmentService";
-import { courseService } from "@/services/api/courseService";
-import { isToday, isTomorrow, isPast, isThisWeek } from "date-fns";
-import { toast } from "react-toastify";
+import Courses from "@/components/pages/Courses";
+import Assignments from "@/components/pages/Assignments";
 
 const Dashboard = ({ onMenuClick }) => {
   const [assignments, setAssignments] = useState([]);
@@ -45,14 +47,14 @@ const Dashboard = ({ onMenuClick }) => {
 
   const handleToggleComplete = async (assignmentId, completed) => {
     try {
-      const assignment = assignments.find(a => a.Id === assignmentId);
+const assignment = assignments.find(a => a.Id === assignmentId);
       if (!assignment) return;
 
-      const updatedAssignment = { ...assignment, completed };
+const updatedAssignment = { ...assignment, completed_c: completed };
       await assignmentService.update(assignmentId, updatedAssignment);
       
       setAssignments(prev => prev.map(a => 
-        a.Id === assignmentId ? { ...a, completed } : a
+a.Id === assignmentId ? { ...a, completed_c: completed } : a
       ));
       
       toast.success(completed ? "Assignment marked as complete!" : "Assignment marked as pending");
@@ -74,27 +76,26 @@ const Dashboard = ({ onMenuClick }) => {
     }
   };
 
-  const getCourseById = (courseId) => {
+const getCourseById = (courseId) => {
     return courses.find(c => c.Id === courseId);
   };
-
   // Calculate statistics
   const stats = {
-    totalAssignments: assignments.length,
-    completedAssignments: assignments.filter(a => a.completed).length,
-    overdueAssignments: assignments.filter(a => isPast(a.dueDate) && !a.completed).length,
-    upcomingAssignments: assignments.filter(a => !isPast(a.dueDate) && !a.completed).length
+totalAssignments: assignments.length,
+    completedAssignments: assignments.filter(a => a.completed_c).length,
+    overdueAssignments: assignments.filter(a => isPast(a.dueDate) && !a.completed_c).length,
+    upcomingAssignments: assignments.filter(a => !isPast(a.dueDate) && !a.completed_c).length
   };
 
   // Get upcoming assignments (next 7 days)
-  const upcomingAssignments = assignments
-    .filter(a => !a.completed && (isToday(a.dueDate) || isTomorrow(a.dueDate) || isThisWeek(a.dueDate)))
+const upcomingAssignments = assignments
+    .filter(a => !a.completed_c && (isToday(a.dueDate) || isTomorrow(a.dueDate) || isThisWeek(a.dueDate)))
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
     .slice(0, 5);
 
   // Get overdue assignments
-  const overdueAssignments = assignments
-    .filter(a => isPast(a.dueDate) && !a.completed)
+const overdueAssignments = assignments
+    .filter(a => isPast(a.dueDate) && !a.completed_c)
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
     .slice(0, 3);
 
@@ -168,9 +169,9 @@ const Dashboard = ({ onMenuClick }) => {
                   <div className="space-y-4">
                     {upcomingAssignments.map(assignment => (
                       <AssignmentCard
-                        key={assignment.Id}
+key={assignment.Id}
                         assignment={assignment}
-                        course={getCourseById(assignment.courseId)}
+                        course={getCourseById(assignment.course_id_c?.Id || assignment.course_id_c)}
                         onToggleComplete={handleToggleComplete}
                       />
                     ))}
@@ -190,12 +191,12 @@ const Dashboard = ({ onMenuClick }) => {
                   </div>
                   
                   <div className="space-y-3">
-                    {overdueAssignments.map(assignment => {
-                      const course = getCourseById(assignment.courseId);
+{overdueAssignments.map(assignment => {
+                      const course = getCourseById(assignment.course_id_c?.Id || assignment.course_id_c);
                       return (
                         <div key={assignment.Id} className="p-3 bg-red-50 rounded-lg border border-red-200">
-                          <h4 className="font-medium text-red-900 text-sm">{assignment.title}</h4>
-                          <p className="text-red-700 text-xs">{course?.code}</p>
+                          <h4 className="font-medium text-red-900 text-sm">{assignment.title_c}</h4>
+                          <p className="text-red-700 text-xs">{course?.code_c}</p>
                         </div>
                       );
                     })}
@@ -217,11 +218,13 @@ const Dashboard = ({ onMenuClick }) => {
                 ) : (
                   <div className="space-y-3">
                     {courses.slice(0, 4).map(course => {
-                      const courseAssignments = assignments.filter(a => a.courseId === course.Id);
-                      const completed = courseAssignments.filter(a => a.completed).length;
+const courseAssignments = assignments.filter(a => 
+                        a.course_id_c?.Id === course.Id || a.course_id_c === course.Id);
+                      const completed = courseAssignments.filter(a => a.completed_c).length;
                       
                       return (
                         <div key={course.Id} className="flex items-center justify-between">
+                          <span className="text-sm font-medium">{course.name_c}</span>
                           <div className="flex items-center">
                             <div 
                               className="w-3 h-3 rounded-full mr-3"
@@ -246,11 +249,11 @@ const Dashboard = ({ onMenuClick }) => {
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-gray-600">Completion Rate</span>
-                      <span className="font-medium">
+<span className="font-medium">
                         {stats.totalAssignments === 0 ? "0%" : Math.round((stats.completedAssignments / stats.totalAssignments) * 100) + "%"}
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+<div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-300"
                         style={{ 

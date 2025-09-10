@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
-import Header from "@/components/organisms/Header";
-import AssignmentCard from "@/components/molecules/AssignmentCard";
-import FilterBar from "@/components/molecules/FilterBar";
-import SearchBar from "@/components/molecules/SearchBar";
-import Button from "@/components/atoms/Button";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
-import AssignmentModal from "@/components/organisms/AssignmentModal";
+import React, { useEffect, useState } from "react";
 import { assignmentService } from "@/services/api/assignmentService";
 import { courseService } from "@/services/api/courseService";
 import { isPast } from "date-fns";
 import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import SearchBar from "@/components/molecules/SearchBar";
+import AssignmentCard from "@/components/molecules/AssignmentCard";
+import FilterBar from "@/components/molecules/FilterBar";
+import Button from "@/components/atoms/Button";
+import Header from "@/components/organisms/Header";
+import AssignmentModal from "@/components/organisms/AssignmentModal";
 
 const Assignments = ({ onMenuClick }) => {
   const [assignments, setAssignments] = useState([]);
@@ -50,14 +50,14 @@ const Assignments = ({ onMenuClick }) => {
 
   const handleToggleComplete = async (assignmentId, completed) => {
     try {
-      const assignment = assignments.find(a => a.Id === assignmentId);
+const assignment = assignments.find(a => a.Id === assignmentId);
       if (!assignment) return;
 
-      const updatedAssignment = { ...assignment, completed };
+const updatedAssignment = { ...assignment, completed_c: completed };
       await assignmentService.update(assignmentId, updatedAssignment);
       
       setAssignments(prev => prev.map(a => 
-        a.Id === assignmentId ? { ...a, completed } : a
+a.Id === assignmentId ? { ...a, completed_c: completed } : a
       ));
       
       toast.success(completed ? "Assignment marked as complete!" : "Assignment marked as pending");
@@ -116,33 +116,35 @@ const Assignments = ({ onMenuClick }) => {
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(assignment =>
-        assignment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+filtered = filtered.filter(assignment =>
+        assignment.title_c.toLowerCase().includes(searchTerm.toLowerCase()) ||
         assignment.description?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Course filter
+// Course filter
     if (selectedCourse) {
-      filtered = filtered.filter(assignment => assignment.courseId === selectedCourse);
+      filtered = filtered.filter(assignment => 
+        assignment.course_id_c?.Id == selectedCourse || assignment.course_id_c == selectedCourse
+      );
     }
 
     // Priority filter
     if (selectedPriority) {
-      filtered = filtered.filter(assignment => assignment.priority === selectedPriority);
+      filtered = filtered.filter(assignment => assignment.priority_c === selectedPriority);
     }
 
     // Status filter
     if (selectedStatus) {
       switch (selectedStatus) {
         case "pending":
-          filtered = filtered.filter(assignment => !assignment.completed && !isPast(assignment.dueDate));
+          filtered = filtered.filter(assignment => !assignment.completed_c && !isPast(assignment.dueDate));
           break;
         case "completed":
-          filtered = filtered.filter(assignment => assignment.completed);
+          filtered = filtered.filter(assignment => assignment.completed_c);
           break;
         case "overdue":
-          filtered = filtered.filter(assignment => !assignment.completed && isPast(assignment.dueDate));
+          filtered = filtered.filter(assignment => isPast(assignment.dueDate) && !assignment.completed_c);
           break;
       }
     }
@@ -240,8 +242,8 @@ const Assignments = ({ onMenuClick }) => {
               {filteredAssignments.map(assignment => (
                 <AssignmentCard
                   key={assignment.Id}
-                  assignment={assignment}
-                  course={getCourseById(assignment.courseId)}
+assignment={assignment}
+                  course={getCourseById(assignment.course_id_c?.Id || assignment.course_id_c)}
                   onToggleComplete={handleToggleComplete}
                   onEdit={handleEditAssignment}
                   onDelete={handleDeleteAssignment}

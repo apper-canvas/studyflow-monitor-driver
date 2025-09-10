@@ -5,14 +5,14 @@ import Select from "@/components/atoms/Select";
 import ApperIcon from "@/components/ApperIcon";
 
 const CourseModal = ({ isOpen, onClose, onSave, course }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    code: "",
-    instructor: "",
-    credits: 3,
-    color: "#6366f1",
-    semester: "Fall",
-    year: new Date().getFullYear()
+const [formData, setFormData] = useState({
+    name_c: "",
+    code_c: "",
+    instructor_c: "",
+    credits_c: 3,
+    color_c: "#6366f1",
+    semester_c: "Fall",
+    year_c: new Date().getFullYear()
   });
 
   const [errors, setErrors] = useState({});
@@ -24,14 +24,14 @@ const CourseModal = ({ isOpen, onClose, onSave, course }) => {
 
   useEffect(() => {
     if (course) {
-      setFormData({
-        name: course.name || "",
-        code: course.code || "",
-        instructor: course.instructor || "",
-        credits: course.credits || 3,
-        color: course.color || "#6366f1",
-        semester: course.semester || "Fall",
-        year: course.year || new Date().getFullYear()
+setFormData({
+        name_c: course.name_c || "",
+        code_c: course.code_c || "",
+        instructor_c: course.instructor_c || "",
+        credits_c: course.credits_c || 3,
+        color_c: course.color_c || "#6366f1",
+        semester_c: course.semester_c || "Fall",
+        year_c: course.year_c || new Date().getFullYear()
       });
     } else {
       setFormData({
@@ -50,20 +50,20 @@ const CourseModal = ({ isOpen, onClose, onSave, course }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.name.trim()) {
-      newErrors.name = "Course name is required";
+if (!formData.name_c.trim()) {
+      newErrors.name_c = "Course name is required";
     }
     
-    if (!formData.code.trim()) {
-      newErrors.code = "Course code is required";
+    if (!formData.code_c.trim()) {
+      newErrors.code_c = "Course code is required";
     }
     
-    if (!formData.instructor.trim()) {
-      newErrors.instructor = "Instructor name is required";
+    if (!formData.instructor_c.trim()) {
+      newErrors.instructor_c = "Instructor name is required";
     }
     
-    if (formData.credits <= 0) {
-      newErrors.credits = "Credits must be greater than 0";
+    if (formData.credits_c <= 0) {
+      newErrors.credits_c = "Credits must be greater than 0";
     }
     
     setErrors(newErrors);
@@ -75,10 +75,10 @@ const CourseModal = ({ isOpen, onClose, onSave, course }) => {
     
     if (!validateForm()) return;
     
-    const courseData = {
+const courseData = {
       ...formData,
-      credits: parseInt(formData.credits),
-      year: parseInt(formData.year)
+      credits_c: parseInt(formData.credits_c),
+      year_c: parseInt(formData.year_c)
     };
     
     onSave(courseData);
@@ -115,35 +115,35 @@ const CourseModal = ({ isOpen, onClose, onSave, course }) => {
         
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <Input
-            label="Course Name"
-            value={formData.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            error={errors.name}
+label="Course Name"
+            value={formData.name_c}
+            onChange={(e) => handleChange("name_c", e.target.value)}
+            error={errors.name_c}
             placeholder="e.g., Introduction to Computer Science"
           />
           
-          <Input
+<Input
             label="Course Code"
-            value={formData.code}
-            onChange={(e) => handleChange("code", e.target.value)}
-            error={errors.code}
+            value={formData.code_c}
+            onChange={(e) => handleChange("code_c", e.target.value)}
+            error={errors.code_c}
             placeholder="e.g., CS 101"
           />
           
-          <Input
+<Input
             label="Instructor"
-            value={formData.instructor}
-            onChange={(e) => handleChange("instructor", e.target.value)}
-            error={errors.instructor}
+            value={formData.instructor_c}
+            onChange={(e) => handleChange("instructor_c", e.target.value)}
+            error={errors.instructor_c}
             placeholder="e.g., Prof. Johnson"
           />
           
-          <Input
+<Input
             label="Credits"
             type="number"
-            value={formData.credits}
-            onChange={(e) => handleChange("credits", e.target.value)}
-            error={errors.credits}
+            value={formData.credits_c}
+            onChange={(e) => handleChange("credits_c", e.target.value)}
+            error={errors.credits_c}
             min="1"
             max="6"
           />
@@ -157,9 +157,9 @@ const CourseModal = ({ isOpen, onClose, onSave, course }) => {
                 <button
                   key={color}
                   type="button"
-                  onClick={() => handleChange("color", color)}
+onClick={() => handleChange("color_c", color)}
                   className={`w-12 h-12 rounded-lg border-2 transition-all ${
-                    formData.color === color ? "border-gray-400 scale-110" : "border-gray-200"
+                    formData.color_c === color ? "border-gray-400 scale-110" : "border-gray-200"
                   }`}
                   style={{ backgroundColor: color }}
                 />
@@ -168,10 +168,10 @@ const CourseModal = ({ isOpen, onClose, onSave, course }) => {
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-            <Select
+<Select
               label="Semester"
-              value={formData.semester}
-              onChange={(e) => handleChange("semester", e.target.value)}
+              value={formData.semester_c}
+              onChange={(e) => handleChange("semester_c", e.target.value)}
             >
               <option value="Spring">Spring</option>
               <option value="Summer">Summer</option>
@@ -179,11 +179,11 @@ const CourseModal = ({ isOpen, onClose, onSave, course }) => {
               <option value="Winter">Winter</option>
             </Select>
             
-            <Input
+<Input
               label="Year"
               type="number"
-              value={formData.year}
-              onChange={(e) => handleChange("year", e.target.value)}
+              value={formData.year_c}
+              onChange={(e) => handleChange("year_c", e.target.value)}
               min="2020"
               max="2030"
             />

@@ -15,25 +15,25 @@ const CourseCard = ({ course, assignmentCount, averageGrade, onEdit, onDelete })
     <Card hover className="p-6">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900">{course.name}</h3>
-          <p className="text-sm text-gray-600">{course.code}</p>
+<h3 className="text-lg font-semibold text-gray-900">{course.name_c}</h3>
+          <p className="text-sm text-gray-600">{course.code_c}</p>
         </div>
         
         <div 
-          className="w-4 h-4 rounded-full"
-          style={{ backgroundColor: course.color }}
+className="w-4 h-4 rounded-full"
+          style={{ backgroundColor: course.color_c }}
         />
       </div>
       
       <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm">
+<div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">Instructor</span>
-          <span className="font-medium">{course.instructor}</span>
+          <span className="font-medium">{course.instructor_c}</span>
         </div>
         
-        <div className="flex items-center justify-between text-sm">
+<div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">Credits</span>
-          <span className="font-medium">{course.credits}</span>
+          <span className="font-medium">{course.credits_c}</span>
         </div>
         
         <div className="flex items-center justify-between text-sm">
@@ -53,7 +53,7 @@ const CourseCard = ({ course, assignmentCount, averageGrade, onEdit, onDelete })
       
       <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
         <p className="text-sm text-gray-500">
-          {course.semester} {course.year}
+{course.semester_c} {course.year_c}
         </p>
         
         <div className="flex items-center space-x-1">

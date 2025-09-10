@@ -6,35 +6,35 @@ import ApperIcon from "@/components/ApperIcon";
 import { format } from "date-fns";
 
 const AssignmentModal = ({ isOpen, onClose, onSave, assignment, courses = [] }) => {
-  const [formData, setFormData] = useState({
-    title: "",
-    courseId: "",
-    description: "",
-    dueDate: "",
-    priority: "medium",
-    maxPoints: 100
+const [formData, setFormData] = useState({
+    title_c: "",
+    course_id_c: "",
+    description_c: "",
+    due_date_c: "",
+    priority_c: "medium",
+    max_points_c: 100
   });
 
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (assignment) {
-      setFormData({
-        title: assignment.title || "",
-        courseId: assignment.courseId || "",
-        description: assignment.description || "",
-        dueDate: assignment.dueDate ? format(assignment.dueDate, "yyyy-MM-dd") : "",
-        priority: assignment.priority || "medium",
-        maxPoints: assignment.maxPoints || 100
+setFormData({
+        title_c: assignment.title_c || "",
+        course_id_c: assignment.course_id_c?.Id || assignment.course_id_c || "",
+        description_c: assignment.description_c || "",
+        due_date_c: assignment.dueDate ? format(assignment.dueDate, "yyyy-MM-dd") : "",
+        priority_c: assignment.priority_c || "medium",
+        max_points_c: assignment.max_points_c || 100
       });
     } else {
-      setFormData({
-        title: "",
-        courseId: "",
-        description: "",
-        dueDate: "",
-        priority: "medium",
-        maxPoints: 100
+setFormData({
+        title_c: "",
+        course_id_c: "",
+        description_c: "",
+        due_date_c: "",
+        priority_c: "medium",
+        max_points_c: 100
       });
     }
     setErrors({});
@@ -43,20 +43,20 @@ const AssignmentModal = ({ isOpen, onClose, onSave, assignment, courses = [] }) 
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.title.trim()) {
-      newErrors.title = "Title is required";
+if (!formData.title_c.trim()) {
+      newErrors.title_c = "Title is required";
     }
     
-    if (!formData.courseId) {
-      newErrors.courseId = "Course is required";
+    if (!formData.course_id_c) {
+      newErrors.course_id_c = "Course is required";
     }
     
-    if (!formData.dueDate) {
-      newErrors.dueDate = "Due date is required";
+    if (!formData.due_date_c) {
+      newErrors.due_date_c = "Due date is required";
     }
     
-    if (formData.maxPoints <= 0) {
-      newErrors.maxPoints = "Max points must be greater than 0";
+    if (formData.max_points_c <= 0) {
+      newErrors.max_points_c = "Max points must be greater than 0";
     }
     
     setErrors(newErrors);
@@ -68,13 +68,13 @@ const AssignmentModal = ({ isOpen, onClose, onSave, assignment, courses = [] }) 
     
     if (!validateForm()) return;
     
-    const assignmentData = {
+const assignmentData = {
       ...formData,
-      dueDate: new Date(formData.dueDate),
-      maxPoints: parseInt(formData.maxPoints),
-      completed: assignment?.completed || false,
-      grade: assignment?.grade || null,
-      createdAt: assignment?.createdAt || new Date()
+      dueDate: new Date(formData.due_date_c),
+      max_points_c: parseInt(formData.max_points_c),
+      completed_c: assignment?.completed_c || false,
+      grade_c: assignment?.grade_c || null,
+      created_at_c: assignment?.created_at_c || new Date().toISOString()
     };
     
     onSave(assignmentData);
@@ -112,22 +112,22 @@ const AssignmentModal = ({ isOpen, onClose, onSave, assignment, courses = [] }) 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <Input
             label="Assignment Title"
-            value={formData.title}
-            onChange={(e) => handleChange("title", e.target.value)}
-            error={errors.title}
+value={formData.title_c}
+            onChange={(e) => handleChange("title_c", e.target.value)}
+            error={errors.title_c}
             placeholder="Enter assignment title"
           />
           
           <Select
             label="Course"
-            value={formData.courseId}
-            onChange={(e) => handleChange("courseId", e.target.value)}
-            error={errors.courseId}
+value={formData.course_id_c}
+            onChange={(e) => handleChange("course_id_c", e.target.value)}
+            error={errors.course_id_c}
           >
             <option value="">Select a course</option>
             {courses.map(course => (
-              <option key={course.Id} value={course.Id}>
-                {course.code} - {course.name}
+<option key={course.Id} value={course.Id}>
+                {course.code_c} - {course.name_c}
               </option>
             ))}
           </Select>
@@ -137,8 +137,8 @@ const AssignmentModal = ({ isOpen, onClose, onSave, assignment, courses = [] }) 
               Description
             </label>
             <textarea
-              value={formData.description}
-              onChange={(e) => handleChange("description", e.target.value)}
+value={formData.description_c}
+              onChange={(e) => handleChange("description_c", e.target.value)}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
               placeholder="Enter assignment description (optional)"
@@ -148,15 +148,15 @@ const AssignmentModal = ({ isOpen, onClose, onSave, assignment, courses = [] }) 
           <Input
             label="Due Date"
             type="date"
-            value={formData.dueDate}
-            onChange={(e) => handleChange("dueDate", e.target.value)}
-            error={errors.dueDate}
+value={formData.due_date_c}
+            onChange={(e) => handleChange("due_date_c", e.target.value)}
+            error={errors.due_date_c}
           />
           
           <Select
             label="Priority"
-            value={formData.priority}
-            onChange={(e) => handleChange("priority", e.target.value)}
+value={formData.priority_c}
+            onChange={(e) => handleChange("priority_c", e.target.value)}
           >
             <option value="low">Low Priority</option>
             <option value="medium">Medium Priority</option>
@@ -166,9 +166,9 @@ const AssignmentModal = ({ isOpen, onClose, onSave, assignment, courses = [] }) 
           <Input
             label="Max Points"
             type="number"
-            value={formData.maxPoints}
-            onChange={(e) => handleChange("maxPoints", e.target.value)}
-            error={errors.maxPoints}
+value={formData.max_points_c}
+            onChange={(e) => handleChange("max_points_c", e.target.value)}
+            error={errors.max_points_c}
             min="1"
             placeholder="100"
           />
